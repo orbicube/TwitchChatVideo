@@ -9,7 +9,7 @@ namespace TwitchChatVideo
     {
         public const string BaseDir = "./emotes/twitch/";
         const string EmoteSize = "1.0";
-        const string EmoteDownload = "https://static-cdn.jtvnw.net/emoticons/v1/{0}/{1}";
+        const string EmoteDownload = "https://static-cdn.jtvnw.net/emoticons/v2/{0}/default/dark/{1}";
 
         private static Dictionary<string, Image> image_cache = new Dictionary<string, Image>()
         {
@@ -31,7 +31,13 @@ namespace TwitchChatVideo
                 return image_cache[name];
             }
 
-            var emote_path = BaseDir + name + ".png";
+            var extension = ".png";
+            if(name.Contains("emotesv2_"))
+            {
+                extension = ".gif";
+            }
+
+            var emote_path = BaseDir + name + extension;
             var url = string.Format(EmoteDownload, name, EmoteSize);
             var img = TwitchDownloader.GetImage(emote_path, url);
 
