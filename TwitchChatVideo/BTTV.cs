@@ -14,8 +14,8 @@ namespace TwitchChatVideo
     {
         public const string BaseDir = "./emotes/bttv/";
         const string EmoteSize = "1x";
-        const string GlobalURL = "https://api.betterttv.net/2/emotes";
-        const string BaseURL = "https://api.betterttv.net/2/channels/";
+        const string GlobalURL = "https://api.betterttv.net/3/cached/emotes/global";
+        const string BaseURL = "https://api.betterttv.net/3/cached/users/twitch/";
         const string EmoteDownload = "https://cdn.betterttv.net/emote/{0}/{1}";
 
         private Dictionary<string, EmoteList.Emote> emote_dictionary;
@@ -40,8 +40,8 @@ namespace TwitchChatVideo
                     using (var channel_stream = new StreamReader((await channel_req.GetResponseAsync())?.GetResponseStream()))
                     {
                         progress?.Report(new VideoProgress(1, 1, VideoProgress.VideoStatus.BTTV));
-                        var global_emotes = JObject.Parse(global_stream.ReadToEnd()).ToObject<EmoteList>();
-                        var channel_emotes = JObject.Parse(channel_stream.ReadToEnd()).ToObject<EmoteList>();
+                        var global_emotes = JObject.Parse("{\"channelEmotes\":" + global_stream.ReadToEnd() + "}").ToObject<EmoteList>();
+                        var channel_emotes = JObject.Parse(channel_stream.ReadToEnd().Replace("],\"sharedEmotes\":[", ",")).ToObject<EmoteList>();
                         return new BTTV(channel_emotes.Emotes.Concat(global_emotes.Emotes).ToDictionary(x => x.Code));
                     }
                 }
@@ -77,17 +77,13 @@ namespace TwitchChatVideo
 
         public class EmoteList
         {
-            [JsonProperty("urlTemplate")]
-            public string BaseURL { get; set; }
-            [JsonProperty("emotes")]
+            [JsonProperty("channelEmotes")]
             public Emote[] Emotes { get; set; }
 
             public class Emote
             {
                 [JsonProperty("id")]
                 public string ID { get; set; }
-                [JsonProperty("channel")]
-                public string Channel { get; set; }
                 [JsonProperty("code")] 
                 public string Code { get; set; }
                 [JsonProperty("imageType")]
