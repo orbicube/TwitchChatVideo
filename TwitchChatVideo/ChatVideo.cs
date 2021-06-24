@@ -20,7 +20,7 @@ namespace TwitchChatVideo
         public const int HorizontalPad = 5;
         public const int VerticalPad = 5;
 
-        public const int FPS = 24;
+        public const int FPS = 12;
         public const VideoCodec Codec = VideoCodec.H264;
 
         public string ID { get; set; }
